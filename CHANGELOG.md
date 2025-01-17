@@ -9,3 +9,11 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 
 
+
+### Features:
+
+* ci: add GitHub Actions workflows for Elixir project and Dependabot configuration
+
+### Bug Fixes:
+
+* force a release
