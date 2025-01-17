@@ -1,17 +1,19 @@
 defmodule Eliver.Git do
   def index_dirty? do
-    git_status = git "status", "--porcelain"
+    git_status = git("status", "--porcelain")
+
     case git_status do
       {:ok, value} -> Regex.match?(~r/^\s*(D|M|A|R|C)\s/, value)
-      {:error, _}  -> false
+      {:error, _} -> false
     end
   end
 
   def upstream_changes? do
-    count = git "rev-list", ["HEAD..@{u}", "--count"]
+    count = git("rev-list", ["HEAD..@{u}", "--count"])
+
     case count do
       {:ok, count} -> count == "0"
-      {:error, _}  -> true
+      {:error, _} -> true
     end
   end
 
@@ -31,18 +33,18 @@ defmodule Eliver.Git do
   end
 
   def fetch! do
-    git "fetch", "-q"
+    git("fetch", "-q")
   end
 
   def commit!(new_version, changelog_entries) do
-    git "add", "CHANGELOG.md"
-    git "add", "VERSION"
-    git "commit", ["-m", commit_message(new_version, changelog_entries)]
-    git "tag", ["#{new_version}", "-a", "-m", "Version: #{new_version}"]
+    git("add", "CHANGELOG.md")
+    git("add", "VERSION")
+    git("commit", ["-m", commit_message(new_version, changelog_entries)])
+    git("tag", ["#{new_version}", "-a", "-m", "Version: #{new_version}"])
   end
 
   def push!(new_version) do
-    git "push", ["-q", "origin", current_branch(), new_version]
+    git("push", ["-q", "origin", current_branch(), new_version])
   end
 
   defp git(command, args) when is_list(args) do
@@ -55,6 +57,7 @@ defmodule Eliver.Git do
 
   defp run_git_command(command, args) do
     result = System.cmd("git", [command] ++ args)
+
     case result do
       {value, 0} -> {:ok, value}
       {value, _} -> {:error, value}
@@ -69,9 +72,7 @@ defmodule Eliver.Git do
     """
     Version #{new_version}:
 
-    #{Enum.map(changelog_entries, fn(x) -> "* " <> x end) |> Enum.join("\n")}
+    #{Enum.map(changelog_entries, fn x -> "* " <> x end) |> Enum.join("\n")}
     """
   end
-
-
 end
